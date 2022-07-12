@@ -22,7 +22,6 @@ class AddTwoOp : public OpKernel {
         // fetch input tensor
         const Tensor& input_tensor = context->input(0);
         auto input = input_tensor.flat<T>();
-        std::cout << input_tensor.shape() << std::endl;
 
         // allocate output tensor
         Tensor* output_tensor = NULL;
