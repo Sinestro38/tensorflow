@@ -18,7 +18,7 @@ class AddTwoOp : public OpKernel {
   public:  
     explicit AddTwoOp(OpKernelConstruction* context) : OpKernel(context) {  }
 
-    void Compute(OpKernelContext* context) {
+    void Compute(OpKernelContext* context) override {
         // fetch input tensor
         const Tensor& input_tensor = context->input(0);
         auto input = input_tensor.flat<T>();
