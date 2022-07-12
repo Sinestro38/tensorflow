@@ -3,6 +3,10 @@ tf_custom_op_library(
     name = "zero_out.so",
     srcs = ["zero_out.cc"],
 )
+tf_custom_op_library(
+    name = "add_two.so",
+    srcs = ["add_two.cc"],
+)
 
 # User ops.
 
