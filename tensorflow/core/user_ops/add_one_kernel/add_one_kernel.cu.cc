@@ -22,6 +22,11 @@ void compute_gpu_kernel(const int size, const T* in, T* out) {
     add_one<T><<<block_count, thread_per_block>>>(size, in, out);
 }
 
+// Explicitly instantiate function templates
+// -- you need this because while the .cc kernel_example TU is getting compiled, 
+// it won't be able to instantiate the GPU partial specialized template (generate code)
+// like it can with the CPU template because the GPU template is in a different TU
+// that was already compiled (code has already been generated)  
 template void compute_gpu_kernel<int>(const int size, const int* in, int* out);
 template void compute_gpu_kernel<float>(const int size, const float* in, float* out);
 #endif // GOOGLE_CUDA

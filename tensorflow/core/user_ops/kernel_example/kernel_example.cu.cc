@@ -34,6 +34,10 @@ void ExampleFunctor<GPUDevice, T>::operator()(
 }
 
 // Explicitly instantiate functors for the types of OpKernels registered.
+// -- you need this because while the .cc kernel_example TU is getting compiled, 
+// it won't be able to instantiate the GPU partial specialized template (generate code)
+// like it can with the CPU template because the GPU template is in a different TU
+// that was already compiled (code has already been generated)  
 template struct ExampleFunctor<GPUDevice, float>;
 template struct ExampleFunctor<GPUDevice, int32>;
 
