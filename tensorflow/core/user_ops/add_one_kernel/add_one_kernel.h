@@ -1,12 +1,20 @@
 #ifndef ADD_ONE_KERNEL_H_
 #define ADD_ONE_KERNEL_H_
 
-#ifdef GOOGLE_CUDA
-template <typename T>
-void compute_gpu_kernel(const int size, const T* in, T* out);
-#endif
+#include <unsupported/Eigen/CXX11/Tensor>
 
-template<typename T>
-void compute_cpu_kernel(const int size, const T* in, T* out);
+// Parent template
+template <typename Device, typename T>
+struct KernelFunctor {
+  void operator()(const Device& d, const int size, const T* in, T* out);
+};
+
+#ifdef GOOGLE_CUDA
+// GPU partial specialization template declaration
+template <typename T>
+struct KernelFunctor<Eigen::GpuDevice, T> {
+  void operator()(const Eigen::GpuDevice& d, const int size, const T* in, T* out);
+};
+#endif
 
 #endif ADD_ONE_KERNEL_H_
