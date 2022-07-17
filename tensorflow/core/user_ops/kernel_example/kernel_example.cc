@@ -19,7 +19,8 @@ REGISTER_OP("Example")
       return Status::OK();
     });
 
-// CPU specialization of actual computation.
+// CPU partial specialization of actual computation.
+// check this out https://en.cppreference.com/w/cpp/language/partial_specialization
 template <typename T>
 struct ExampleFunctor<CPUDevice, T> {
   void operator()(const CPUDevice& d, int size, const T* in, T* out) {
@@ -29,6 +30,7 @@ struct ExampleFunctor<CPUDevice, T> {
   }
 };
 
+namespace pavan {
 // OpKernel definition.
 // template parameter <T> is the datatype of the tensors.
 template <typename Device, typename T>
@@ -46,9 +48,8 @@ class ExampleOp : public OpKernel {
                                                      &output_tensor));
 
     // Do the computation.
-    OP_REQUIRES(context, input_tensor.NumElements() <= tensorflow::kint32max,
-                errors::InvalidArgument("Too many elements in tensor"));
-    ExampleFunctor<Device, T>()(
+    ExampleFunctor<Device, T> kernel_compute;
+    kernel_compute(
         context->eigen_device<Device>(),
         static_cast<int>(input_tensor.NumElements()),
         input_tensor.flat<T>().data(),
@@ -56,11 +57,13 @@ class ExampleOp : public OpKernel {
   }
 };
 
+} // pavan namespace
+
 // Register the CPU kernels.
 #define REGISTER_CPU(T)                                          \
   REGISTER_KERNEL_BUILDER(                                       \
       Name("Example").Device(DEVICE_CPU).TypeConstraint<T>("T"), \
-      ExampleOp<CPUDevice, T>);
+      pavan::ExampleOp<CPUDevice, T>);
 REGISTER_CPU(float);
 REGISTER_CPU(int32);
 
@@ -71,7 +74,7 @@ REGISTER_CPU(int32);
   extern template class ExampleFunctor<GPUDevice, T>;            \
   REGISTER_KERNEL_BUILDER(                                       \
       Name("Example").Device(DEVICE_GPU).TypeConstraint<T>("T"), \
-      ExampleOp<GPUDevice, T>);
+      pavan::ExampleOp<GPUDevice, T>);
 REGISTER_GPU(float);
 REGISTER_GPU(int32);
 #endif  // GOOGLE_CUDA

@@ -3,6 +3,7 @@
 #define EIGEN_USE_GPU
 #include "kernel_example.h"
 #include "tensorflow/core/util/gpu_kernel_helper.h"
+#include "stdio.h"
 
 using namespace tensorflow;
 
@@ -13,6 +14,7 @@ template <typename T>
 __global__ void ExampleCudaKernel(const int size, const T* in, T* out) {
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
        i += blockDim.x * gridDim.x) {
+    printf("GPU KERNEL EXECUTING \n");
     out[i] = 2 * __ldg(in + i);
   }
 }
@@ -35,4 +37,5 @@ void ExampleFunctor<GPUDevice, T>::operator()(
 template struct ExampleFunctor<GPUDevice, float>;
 template struct ExampleFunctor<GPUDevice, int32>;
 
-#endif  // GOOGLE_CUDA
+
+#endif  // GOOGLE_CUDA 
